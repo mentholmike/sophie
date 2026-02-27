@@ -1,0 +1,16 @@
+# Trading Strategy & Portfolio Template
+
+## Current Strategy
+[Describe your trading approach without specific positions]
+
+## Active Markets
+- Market 1: [MARKET_NAME] - [YES/NO] - [THESIS]
+- Market 2: [MARKET_NAME] - [YES/NO] - [THESIS]
+
+## Performance Metrics
+- Win rate: [PERCENTAGE]
+- Average position size: [RANGE]
+- Risk parameters: [DESCRIPTION]
+
+## Lessons Learned
+[Document trading lessons without specific trade details or PnL]

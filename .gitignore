@@ -1,0 +1,179 @@
+# OpenClaw Workspace .gitignore
+# Protects secrets, personal data, and runtime state
+# Updated: 2026-02-24
+
+# ============================================================
+# SECRETS & CREDENTIALS (NEVER COMMIT)
+# ============================================================
+
+# Environment files with API keys
+.env
+.env.*
+!.env.template
+
+# Credential files
+.x_api_creds
+.pi
+*_credentials*
+*_secrets*
+*api_key*
+*API_KEY*
+
+# ============================================================
+# PERSONAL DATA & MEMORY (NEVER COMMIT)
+# ============================================================
+
+# ALL daily conversation logs (Sophie's memory with you)
+memory/2026-*.md
+memory/202*.md
+memory/*.md
+!memory/*.template
+!memory/ontology/
+
+# Memory databases and logs  
+memory/episodic/
+memory/semantic/
+memory/snapshots/
+memory/drift-log.jsonl
+memory/loss-log.jsonl
+memory/heartbeat-state.json
+
+# Explicitly allow only templates and structure
+!memory/conviction-score.md.template
+!memory/trading-focus.md.template
+!memory/ontology/*.yaml
+!memory/ontology/*.jsonl
+
+# ============================================================
+# TRADING DATA & STATE (NEVER COMMIT)
+# ============================================================
+
+# Live trading data
+data/
+!data/.gitkeep
+
+# ACTUAL trading portfolio (not the template)
+TRADES.md
+!TRADES.md.template
+
+# Runtime state files
+.elon_tracker_state.json
+.clawhub/
+.openclaw/
+
+# ============================================================
+# CONTEXT FILES (COMMIT - System Logic & Learned Patterns)
+# ============================================================
+
+# Include all context files - these are system knowledge, not personal data
+!context/
+!context/**/*
+
+# If you discover sensitive files in context later, exclude them here:
+# context/sensitive-example.md
+
+# ============================================================
+# LOGS & TEMPORARY FILES (NEVER COMMIT)
+# ============================================================
+
+logs/
+*.log
+*.log.*
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+.mypy_cache/
+.coverage
+*.egg-info/
+
+# ============================================================
+# REPORTS (KEEP STRUCTURE, IGNORE CONTENT)
+# ============================================================
+
+reports/market-scan/*
+!reports/market-scan/.gitkeep
+reports/**/*
+!reports/**/.gitkeep
+
+# ============================================================
+# NESTED GIT REPOS
+# ============================================================
+
+skills/**/.git
+
+# ============================================================
+# OPERATING SYSTEM FILES
+# ============================================================
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ============================================================
+# IDE / EDITOR FILES
+# ============================================================
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.venv/
+venv/
+ENV/
+env/
+
+# ============================================================
+# EXPLICITLY ALLOWED FILES
+# ============================================================
+
+# Agent documentation
+!AGENTS.md
+!BOOTSTRAP.md
+!HEARTBEAT.md
+!IDENTITY.md
+!MEMORY.md
+!SOUL.md
+!TOOLS.md
+!USER.md
+
+# Documentation
+!docs/
+!docs/**/*.md
+
+# Skills
+!skills/
+!skills/**/*.md
+!skills/**/*.json
+!skills/**/*.py
+!skills/**/*.sh
+!skills/**/*.mjs
+!skills/**/*.yaml
+
+# Scripts (already audited)
+!scripts/
+!scripts/**/*.py
+!scripts/**/*.sh
+
+# Task definitions
+!tasks/
+!tasks/*.md
+
+# Templates
+!*.template
+
+scalper-loop.sh
+scalper-monitor.sh
+scanner.sh
+scanner.log

@@ -1,0 +1,60 @@
+types:
+  Market:
+    required: [id, title, outcome]
+    properties:
+      conditionId: string
+      slug: string
+      category: enum[crypto, weather, sports, politics, other]
+      liquidity: number
+      volume24h: number
+      endDate: string
+      resolutionSource: string
+
+  Trade:
+    required: [marketId, token, side, amount, entryPrice]
+    properties:
+      shares: number
+      timestamp: string
+      status: enum[open, pending, closed, resolved]
+      exitPrice: number
+      pnl: number
+      conviction: number
+      edge: number
+
+  Document:
+    required: [title, pathOrUrl]
+    properties:
+      summary: string
+      tags: array
+      sourceType: enum[metary, taf, pirep, aviation_weather, market_report, tweet, email]
+
+  Event:
+    required: [title, start]
+    properties:
+      end: string
+      type: enum[market_expiration, trade_execution, portfolio_review, weather_event]
+      metadata: object
+
+  Person:
+    required: [name]
+    properties:
+      role: string
+      contact: string
+
+relations:
+  trades:
+    from_types: [Person]
+    to_types: [Market]
+    cardinality: many_to_many
+  contains:
+    from_types: [Market]
+    to_types: [Trade]
+    cardinality: one_to_many
+  references:
+    from_types: [Trade, Event, Document]
+    to_types: [Document]
+    cardinality: many_to_many
+  occurs_during:
+    from_types: [Event]
+    to_types: [Market]
+    cardinality: one_to_one

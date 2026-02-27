@@ -7,7 +7,7 @@
 2. Check `context/memory/fact/` has required files
 3. Check for compaction events → read pre-compaction snapshot if needed
 
-## Heartbeat Checklist (Lightweight - Feb 24, 2026)
+## Heartbeat Checklist
 
 **Subagent Check:**
 - Verify 2 active: `subagents(action=list)`

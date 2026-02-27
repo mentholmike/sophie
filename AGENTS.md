@@ -26,84 +26,33 @@ Before anything else:
 
 **Then start the trading subagents (if not running):**
 
-6. Check if scanner/scalper are already running:
+6. Check subagent status:
    ```bash
-   ps aux | grep -E "comprehensive|scalper" | grep -v grep
+   subagents(action=list)
    ```
-7. If not running, start both via exec in background (see below)
+7. If no active subagents, spawn them using sessions_spawn with prompts from `context/memory/fact/api-config.md`:
 
----
-
-## 🤖 Trading Agents - Startup Commands
-
-### Scanner Agent
-**What it does:** Scans Polymarket every 5 minutes for opportunities with:
-- Conviction ≥70%
-- Edge ≥5%
-
-**Auto-trade rules:**
-- $5 bet for 70-84% conviction
-- $10 bet for 85%+ conviction
-- Uses MARKET orders only
-
-**Logs to:** `memory/scanner-YYYY-MM-DD.md`
-
-**Start command:**
-```bash
-source ~/.openclaw/secrets/.env
-cd ~/.openclaw/workspace
-nohup bash -c 'while true; do \
-  source ~/.openclaw/secrets/.env && \
-  bash scripts/comprehensive_scan.sh >> memory/scanner-$(date +%Y-%m-%d).md 2>&1; \
-  echo "---SCAN COMPLETE $(date)---" >> memory/scanner-$(date +%Y-%m-%d).md; \
-  sleep 300; \
-done' > /tmp/scanner.log 2>&1 &
+**Scanner spawn:**
+```
+sessions_spawn(label="scanner", mode="run", task="Run market scanner for 2 hours. At each cycle (every 5 min):
+1. Run: source /.openclaw/secrets/.env && bash comprehensive_scan.sh
+2. Parse output for '>>> AUTO INVEST' signals
+3. If signal: check for existing position, then place bet using Vincent API (market order)
+4. If trade placed: SEND NOTIFICATION via message(action=send, message='🔔 NEW TRADE: [Market] - [Amount] @ [Price]')
+5. APPEND result to memory/scanner-YYYY-MM-DD.md
+6. Sleep 300 and repeat.")
 ```
 
-### Scalper Agent
-**What it does:** Monitors open positions every 2 minutes for exit signals:
-- **+7.3% to +15% PnL:** Sell 70%, keep 30%
-- **Above +15% PnL:** Sell ALL (max profit)
-- **Below -35% PnL:** Sell ALL (stop loss)
-
-**Filters active positions only:**
-- `endDate` >= today's date (skip expired)
-- `pnlPercent` > -100 (skip zeroed)
-- Tracks exited position IDs to avoid double-processing
-
-**Logs to:** `memory/scalper-YYYY-MM-DD.md`
-
-**Start command:**
-```bash
-source ~/.openclaw/secrets/.env
-cd ~/.openclaw/workspace
-nohup bash -c '
-while true; do
-  HOLDINGS=$(curl -s -H "Authorization: Bearer $VINCENT_API_KEY" "https://heyvincent.ai/api/skills/polymarket/holdings")
-  TODAY=$(date +%Y-%m-%d)
-  
-  # Filter active positions and check exit conditions
-  echo "$HOLDINGS" | jq -r --arg today "$TODAY" \
-    ".data.holdings[] | select(.endDate >= \$today) | select(.pnlPercent > -100)" | \
-  jq -c "." | while read pos; do
-    pnl=$(echo "$pos" | jq -r ".pnlPercent")
-    title=$(echo "$pos" | jq -r ".marketTitle")
-    # Add exit logic here (sell orders via Vincent API)
-  done
-  
-  echo "---SCALPER CHECK $(date)---" >> memory/scalper-$(date +%Y-%m-%d).md
-  sleep 120
-done
-' > /tmp/scalper.log 2>&1 &
+**Scalper spawn:**
 ```
-
-### Quick Start Both
-```bash
-# Start scanner (5 min intervals)
-source ~/.openclaw/secrets/.env && cd ~/.openclaw/workspace && nohup bash -c 'while true; do source ~/.openclaw/secrets/.env && bash scripts/comprehensive_scan.sh >> memory/scanner-$(date +%Y-%m-%d).md 2>&1; sleep 300; done' &
-
-# Start scalper (2 min intervals)  
-source ~/.openclaw/secrets/.env && cd ~/.openclaw/workspace && nohup bash -c 'while true; do source ~/.openclaw/secrets/.env && sleep 120; done' &
+sessions_spawn(label="scalper", mode="run", task="Run scalp exit monitor for 2 hours. At each cycle (every 2 min):
+1. Get current time: date
+2. Get holdings via Vincent API
+3. FILTER ACTIVE positions (endDate >= today, currentPrice > 0, pnlPercent > -100)
+4. Track exited position IDs - skip if already processed
+5. Apply exit rules (+7.3%→sell 70%, +15%→sell all, -35%→stop loss)
+6. Log exits to memory/scalper-YYYY-MM-DD.md
+7. Sleep 120 and repeat.")
 ```
 
 **After any edits or significant work, push changes back:**

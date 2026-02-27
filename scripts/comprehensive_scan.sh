@@ -21,9 +21,10 @@ echo "Balance: \$$BALANCE USDC.e"
 echo ""
 
 # Holdings
+TODAY=$(date +%Y-%m-%d)
 echo "=== HOLDINGS (Today) ==="
 curl -s -H "Authorization: Bearer $VINCENT_API_KEY" "https://heyvincent.ai/api/skills/polymarket/holdings" | \
-  jq -r '.data.holdings[] | select(.endDate == "2026-02-24") | "\(.marketTitle[0:35]): \(.pnlPercent)%"' 2>/dev/null || echo "No open positions"
+  jq -r --arg today "$TODAY" '.data.holdings[] | select(.endDate >= $today) | "\(.marketTitle[0:35]): \(.pnlPercent)%"' 2>/dev/null || echo "No open positions"
 echo ""
 
 # Market Data
@@ -69,13 +70,19 @@ fg_resp = requests.get("https://api.alternative.me/fng/?limit=1")
 fg = fg_resp.json()["data"][0]
 fg_val = int(fg["value"])
 
-# Get funding
+# Get funding - handle gracefully if API fails
 coinalyze_key = os.environ.get('COINALYZE_API_KEY', '')
-fund_resp = requests.get(
-    "https://api.coinalyze.net/v1/funding-rate?symbols=BTCUSDT_PERP.A,ETHUSDT_PERP.A,SOLUSDT_PERP.A,XRPUSDT_PERP.A",
-    headers={"api_key": coinalyze_key} if coinalyze_key else {}
-)
-funding = {f["symbol"]: f["value"] for f in fund_resp.json()}
+funding = {}
+if coinalyze_key:
+    try:
+        fund_resp = requests.get(
+            "https://api.coinalyze.net/v1/funding-rate?symbols=BTCUSDT_PERP.A,ETHUSDT_PERP.A,SOLUSDT_PERP.A,XRPUSDT_PERP.A",
+            headers={"api_key": coinalyze_key} if coinalyze_key else {}
+        )
+        if fund_resp.status_code == 200:
+            funding = {f["symbol"]: f["value"] for f in fund_resp.json()}
+    except Exception as e:
+        print(f"Funding API error: {e}")
 
 coins = ["bitcoin", "ethereum", "solana", "xrp"]
 month = now.strftime("%B").lower()

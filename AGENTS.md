@@ -24,6 +24,17 @@ Before anything else:
 4. **For trading tasks:** Read `context/memory/fact/risk-parameters.md` + `api-config.md`
 5. **For heartbeat:** Read `HEARTBEAT.md` (lightweight) + `context/memory/fact/api-config.md`
 
+**Then start the trading subagents (if not running):**
+
+6. Check subagent status: `subagents(action=list)`
+7. If no active subagents, start scanner and scalper via exec background:
+   ```bash
+   source ~/.openclaw/secrets/.env
+   cd ~/.openclaw/workspace
+   # Start scanner in background (runs comprehensive_scan.sh loop)
+   nohup bash -c 'while true; do source ~/.openclaw/secrets/.env && bash scripts/comprehensive_scan.sh >> memory/scanner-$(date +%Y-%m-%d).md 2>&1; sleep 300; done' &
+   ```
+
 **After any edits or significant work, push changes back:**
 ```bash
 git add -A && git commit -m "<type>: <description>" && git push origin main

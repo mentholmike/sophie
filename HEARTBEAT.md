@@ -2,29 +2,10 @@
 
 > **Lightweight reference. Full content in `context/` folder.**
 
-## Session Startup
-```bash
-cd ~/.openclaw/workspace && git pull origin main
-```
-
-## Git Workflow
-- Branch: `main`
-- Commit types: `feat:`, `fix:`, `update:`, `docs:`, `refactor:`, `chore:`
-- **Never commit secrets** — use `.gitignore`
-
 ## Memory Health Check (Every Heartbeat)
 1. Verify `memory/YYYY-MM-DD.md` exists
 2. Check `context/memory/fact/` has required files
 3. Check for compaction events → read pre-compaction snapshot if needed
-
-## Context Loading Strategy
-
-| Task | Files to Load |
-|------|---------------|
-| Trading | `context/memory/fact/risk-parameters.md` + `api-config.md` |
-| Risk Parameters | `context/memory/fact/risk-parameters.md` |
-| Heartbeat | `context/memory/fact/risk-parameters.md` + `api-config.md` |
-| Weekly Reflection | `context/memory/episodic/trading-lessons.md` + `preferences.md` |
 
 ## Heartbeat Checklist (Lightweight - Feb 24, 2026)
 
@@ -50,36 +31,9 @@ cd ~/.openclaw/workspace && git pull origin main
 - Position monitoring → scalper handles
 - Balance check → use Vincent API (`/balance`)
 
-**DO NOT Re-scan Markets in Heartbeat** — scanner handles this.
-
-## Subagent System
-
-### Scanner
-- Scan: 5 min intervals
-- Trigger: Conviction ≥70% + Edge ≥5%
-- Size: $5 (70-84%), $10 (85%+)
-- Use: MARKET orders only
-
-### Scalper
-- Monitor: 2 min intervals
-- Exit: +7.3% to +15% → sell 70%, +15%+ → sell all, -35% → hard stop
-- Use: MARKET orders only
+**DO NOT Re-scan Markets in Heartbeat** scanners do all the heavy lifting
 
 ### Spawn Schedule
 - Run 2-hour sessions
 - Respawn after timeout
-
-## Key Rules
-
-- **Min edge:** 5%
-- **Max position:** $25
-- **Auto-trade:** Conviction ≥70% + Edge ≥5%
-- **Loss alert:** 3 losses in 6h → pause
-
-## Notifications
-- Telegram notifications enabled for: new trades, profit exits, max profit, stop losses
-
 ---
-
-*For full trading rules, see `context/memory/fact/risk-parameters.md`*
-*For API details, see `context/memory/fact/api-config.md`*

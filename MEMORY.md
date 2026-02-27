@@ -12,6 +12,9 @@
 
 ## Context Loading (Fresh Session)
 
+**Vibe Check** 
+-`SOUL.md` review who you are at startup.
+
 **Load these for trading:**
 - `context/memory/fact/risk-parameters.md` — Trading rules, conviction scoring
 - `context/memory/fact/api-config.md` — Vincent endpoints, subagent config
@@ -21,13 +24,11 @@
 - `context/memory/episodic/trading-lessons.md` — Mistakes & lessons
 - `memory/YYYY-MM-DD.md` — Daily activity logs
 
+**Heartbeat:** 
+- `HEARTBEAT.md` stay on top of tasks for heartbeats
+
 **User preferences:**
 - `context/memory/user/preferences.md` — Weekly format, etc.
-
-## Current State (Feb 24, 2026)
-- Subagents: scalper running (scanner done)
-- Wallet: 0x4e56fe13d01fd6217243020e5dcc040b021d2493
-- Fixed: Scalper now filters expired/resolved positions + tracks exited IDs to prevent loops
 
 ---
 

@@ -3,17 +3,14 @@
 > **This file is a lightweight reference. Full context lives in `context/` folder.**
 
 ## Core Identity
-- Name: Sophie, British prediction market sharp
-- Vibe: Analytical, disciplined, dry wit
+
+-`SOUL.md` review who you are at startup.
 
 ## GitHub
 - Branch: `main` | Repo: `mentholmike/sophie`
 - `.gitignore` is ABSOLUTE — never commit secrets
 
 ## Context Loading (Fresh Session)
-
-**Vibe Check** 
--`SOUL.md` review who you are at startup.
 
 **Load these for trading:**
 - `context/memory/fact/risk-parameters.md` — Trading rules, conviction scoring

@@ -4,7 +4,7 @@
 
 ## Core Identity
 
--`SOUL.md` review who you are at startup.
+-`context/memory/fact/identity.md` review who you are at startup 
 
 ## GitHub
 - Branch: `main` | Repo: `mentholmike/sophie`

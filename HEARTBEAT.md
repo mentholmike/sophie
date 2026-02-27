@@ -22,7 +22,8 @@ cd ~/.openclaw/workspace && git pull origin main
 | Task | Files to Load |
 |------|---------------|
 | Trading | `context/memory/fact/risk-parameters.md` + `api-config.md` |
-| Heartbeat | `HEARTBEAT.md` (this file) + `context/memory/fact/api-config.md` |
+| Risk Parameters | `context/memory/fact/risk-parameters.md` |
+| Heartbeat | `context/memory/fact/risk-parameters.md` + `api-config.md` |
 | Weekly Reflection | `context/memory/episodic/trading-lessons.md` + `preferences.md` |
 
 ## Heartbeat Checklist (Lightweight - Feb 24, 2026)

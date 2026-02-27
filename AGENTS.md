@@ -26,14 +26,85 @@ Before anything else:
 
 **Then start the trading subagents (if not running):**
 
-6. Check subagent status: `subagents(action=list)`
-7. If no active subagents, start scanner and scalper via exec background:
+6. Check if scanner/scalper are already running:
    ```bash
-   source ~/.openclaw/secrets/.env
-   cd ~/.openclaw/workspace
-   # Start scanner in background (runs comprehensive_scan.sh loop)
-   nohup bash -c 'while true; do source ~/.openclaw/secrets/.env && bash scripts/comprehensive_scan.sh >> memory/scanner-$(date +%Y-%m-%d).md 2>&1; sleep 300; done' &
+   ps aux | grep -E "comprehensive|scalper" | grep -v grep
    ```
+7. If not running, start both via exec in background (see below)
+
+---
+
+## 🤖 Trading Agents - Startup Commands
+
+### Scanner Agent
+**What it does:** Scans Polymarket every 5 minutes for opportunities with:
+- Conviction ≥70%
+- Edge ≥5%
+
+**Auto-trade rules:**
+- $5 bet for 70-84% conviction
+- $10 bet for 85%+ conviction
+- Uses MARKET orders only
+
+**Logs to:** `memory/scanner-YYYY-MM-DD.md`
+
+**Start command:**
+```bash
+source ~/.openclaw/secrets/.env
+cd ~/.openclaw/workspace
+nohup bash -c 'while true; do \
+  source ~/.openclaw/secrets/.env && \
+  bash scripts/comprehensive_scan.sh >> memory/scanner-$(date +%Y-%m-%d).md 2>&1; \
+  echo "---SCAN COMPLETE $(date)---" >> memory/scanner-$(date +%Y-%m-%d).md; \
+  sleep 300; \
+done' > /tmp/scanner.log 2>&1 &
+```
+
+### Scalper Agent
+**What it does:** Monitors open positions every 2 minutes for exit signals:
+- **+7.3% to +15% PnL:** Sell 70%, keep 30%
+- **Above +15% PnL:** Sell ALL (max profit)
+- **Below -35% PnL:** Sell ALL (stop loss)
+
+**Filters active positions only:**
+- `endDate` >= today's date (skip expired)
+- `pnlPercent` > -100 (skip zeroed)
+- Tracks exited position IDs to avoid double-processing
+
+**Logs to:** `memory/scalper-YYYY-MM-DD.md`
+
+**Start command:**
+```bash
+source ~/.openclaw/secrets/.env
+cd ~/.openclaw/workspace
+nohup bash -c '
+while true; do
+  HOLDINGS=$(curl -s -H "Authorization: Bearer $VINCENT_API_KEY" "https://heyvincent.ai/api/skills/polymarket/holdings")
+  TODAY=$(date +%Y-%m-%d)
+  
+  # Filter active positions and check exit conditions
+  echo "$HOLDINGS" | jq -r --arg today "$TODAY" \
+    ".data.holdings[] | select(.endDate >= \$today) | select(.pnlPercent > -100)" | \
+  jq -c "." | while read pos; do
+    pnl=$(echo "$pos" | jq -r ".pnlPercent")
+    title=$(echo "$pos" | jq -r ".marketTitle")
+    # Add exit logic here (sell orders via Vincent API)
+  done
+  
+  echo "---SCALPER CHECK $(date)---" >> memory/scalper-$(date +%Y-%m-%d).md
+  sleep 120
+done
+' > /tmp/scalper.log 2>&1 &
+```
+
+### Quick Start Both
+```bash
+# Start scanner (5 min intervals)
+source ~/.openclaw/secrets/.env && cd ~/.openclaw/workspace && nohup bash -c 'while true; do source ~/.openclaw/secrets/.env && bash scripts/comprehensive_scan.sh >> memory/scanner-$(date +%Y-%m-%d).md 2>&1; sleep 300; done' &
+
+# Start scalper (2 min intervals)  
+source ~/.openclaw/secrets/.env && cd ~/.openclaw/workspace && nohup bash -c 'while true; do source ~/.openclaw/secrets/.env && sleep 120; done' &
+```
 
 **After any edits or significant work, push changes back:**
 ```bash
